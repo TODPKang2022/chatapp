@@ -28,6 +28,8 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import { RootStackParamList } from './src/types';
 import SignupScreen from './src/SignupScreen/SignupScreen';
+import AuthContext from './src/components/AuthContext';
+import AuthProvider from './src/components/AuthProvider';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -48,7 +50,9 @@ const Screens = () => {
 
 
 const App = () => {
-  return <Screens />;
+  return <AuthProvider>
+          <Screens />
+        </AuthProvider>;
 };
 
 

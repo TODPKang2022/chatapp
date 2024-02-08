@@ -1,8 +1,9 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import Screen from "../components/Screen";
 // import validator from 'validator';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Colors from "../modules/Colors";
+import AuthContext from "../components/AuthContext";
 
 const styles = StyleSheet.create({
     container: {
@@ -66,6 +67,7 @@ const SignupScreen = () => {
     const [password, setPassword] = useState('');
     const [confirmedPassword, setConfirmedPassword] = useState('');
     const [name, setName] = useState('');
+    const { processingSignup, signup} = useContext(AuthContext);
 
     // 입력값 확인
     const emailErrorText = useMemo(() => {
@@ -149,63 +151,83 @@ const SignupScreen = () => {
         }
         return [styles.signupButton, styles.disabledSignupButton];
     }, [signupButtonEnabled]);
+
+    const onPressSignupButton = useCallback(async () => {
+        try {
+            await signup(email, password, name);
+        } catch (err: any) {
+            Alert.alert(err.message);
+        }
+    },[signup, email, password, name]);
     
 
     return <Screen title="회원가입">
-        <ScrollView style={styles.container}>
-            <View style={styles.section}>
-                <Text style={styles.title}>이메일</Text>
-                <TextInput 
-                    value={email}
-                    style={styles.input}
-                    onChangeText={onChangeEmailText}
-                    />
-                {emailErrorText && (<Text style={styles.errorText}>{emailErrorText}</Text>)} 
-            </View>
-            <View style={styles.section}>
-                <Text style={styles.title}>비밀번호</Text>
-                <TextInput
-                value={password}
-                style={styles.input}
-                secureTextEntry
-                onChangeText={onChangePasswordText}
-                />
-                {passwordErrorText && (
-                <Text style={styles.errorText}>{passwordErrorText}</Text>
-                )}
-            </View>
-            <View style={styles.section}>
-                <Text style={styles.title}>비밀번호 확인</Text>
-                <TextInput
-                value={confirmedPassword}
-                style={styles.input}
-                secureTextEntry
-                onChangeText={onChangeConfirmedPasswordText}
-                />
-                {confirmedPasswordErrorText && (
-                <Text style={styles.errorText}>{confirmedPasswordErrorText}</Text>
-                )}
-            </View>
-            <View style={styles.section}>
-                <Text style={styles.title}>이름</Text>
-                <TextInput
-                value={name}
-                style={styles.input}
-                onChangeText={onChangeNameText}
-                />
-                {nameErrorText && (
-                <Text style={styles.errorText}>{nameErrorText}</Text>
-                )}
-            </View>
-            <View>
-                <TouchableOpacity style={signupButtonStyle}>
-                    <Text style={styles.signinButtonText}>회원 가입</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.signinTextButton}>
-                    <Text>이미 계정이 있으신가요?</Text>
-                </TouchableOpacity>
-            </View>
-        </ScrollView>
+        {
+            processingSignup ? (
+                <View style={styles.signingContainer}>
+                    <ActivityIndicator />
+                </View>
+            ) : (
+                <ScrollView style={styles.container}>
+                    <View style={styles.section}>
+                        <Text style={styles.title}>이메일</Text>
+                        <TextInput 
+                            value={email}
+                            style={styles.input}
+                            onChangeText={onChangeEmailText}
+                            />
+                        {emailErrorText && (<Text style={styles.errorText}>{emailErrorText}</Text>)} 
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.title}>비밀번호</Text>
+                        <TextInput
+                        value={password}
+                        style={styles.input}
+                        secureTextEntry
+                        onChangeText={onChangePasswordText}
+                        />
+                        {passwordErrorText && (
+                        <Text style={styles.errorText}>{passwordErrorText}</Text>
+                        )}
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.title}>비밀번호 확인</Text>
+                        <TextInput
+                        value={confirmedPassword}
+                        style={styles.input}
+                        secureTextEntry
+                        onChangeText={onChangeConfirmedPasswordText}
+                        />
+                        {confirmedPasswordErrorText && (
+                        <Text style={styles.errorText}>{confirmedPasswordErrorText}</Text>
+                        )}
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.title}>이름</Text>
+                        <TextInput
+                        value={name}
+                        style={styles.input}
+                        onChangeText={onChangeNameText}
+                        />
+                        {nameErrorText && (
+                        <Text style={styles.errorText}>{nameErrorText}</Text>
+                        )}
+                    </View>
+                    <View>
+                        <TouchableOpacity 
+                            style={signupButtonStyle}
+                            onPress={onPressSignupButton}
+                            disabled={!signupButtonEnabled}>
+                            <Text style={styles.signinButtonText}>회원 가입</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.signinTextButton}>
+                            <Text>이미 계정이 있으신가요?</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            )
+        }
+        
     </Screen>;
 }
 
