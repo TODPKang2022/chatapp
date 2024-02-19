@@ -13,6 +13,9 @@ import {
 } from 'react-native';
 import Colors from '../modules/Colors';
 import AuthContext from '../components/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const styles = StyleSheet.create({
   container: {
@@ -76,6 +79,8 @@ const SignupScreen = () => {
   const [confirmedPassword, setConfirmedPassword] = useState('');
   const [name, setName] = useState('');
   const { processingSignup, signup } = useContext(AuthContext);
+  const { navigate } =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // 입력값 확인
   const emailErrorText = useMemo(() => {
@@ -167,6 +172,10 @@ const SignupScreen = () => {
     }
   }, [signup, email, password, name]);
 
+  const onPressSigninButton = useCallback(async () => {
+    navigate('Signin');
+  }, [navigate('Signin')]);
+
   return (
     <Screen title="회원가입">
       {processingSignup ? (
@@ -228,8 +237,12 @@ const SignupScreen = () => {
               disabled={!signupButtonEnabled}>
               <Text style={styles.signupButtonText}>회원 가입</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.signinTextButton}>
-              <Text>이미 계정이 있으신가요?</Text>
+            <TouchableOpacity
+              style={styles.signinTextButton}
+              onPress={onPressSigninButton}>
+              <Text style={styles.signinButtonText}>
+                이미 계정이 있으신가요?
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

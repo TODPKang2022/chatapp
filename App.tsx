@@ -32,6 +32,9 @@ import SigninScreen from './src/SigninScreen/SigninScreen';
 import AuthContext from './src/components/AuthContext';
 import AuthProvider from './src/components/AuthProvider';
 import { useContext } from 'react';
+import HomeScreen from './src/HomeScreen/HomeScreen';
+import LoadingScreen from './src/LoadingScreen/LoadingScreen';
+import ChatScreen from './src/ChatScreen/ChatScreen';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -45,6 +48,19 @@ const Screens = () => {
     useContext(AuthContext);
 
   const renderRootStack = useCallback(() => {
+    if (!initialized) {
+      return <Stack.Screen name="Loading" component={LoadingScreen} />;
+    }
+    //login
+    if (user != null && !processingSignin && !processingSignup) {
+      return (
+        <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Chat" component={ChatScreen} />
+        </>
+      );
+    }
+    // logout
     return (
       <>
         <Stack.Screen name="Signup" component={SignupScreen} />
